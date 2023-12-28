@@ -67,9 +67,7 @@ func GetGeneralWrappedInfo() *GeneralInfo {
 	return &generalInfo
 }
 
-func setupRoutes() *gin.Engine {
-	r := gin.Default()
-
+func setupRoutes(r *gin.Engine) *gin.Engine {
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
@@ -107,9 +105,11 @@ func setupRoutes() *gin.Engine {
 }
 
 func main() {
-	server := setupRoutes()
+	server := gin.Default()
 
 	server.Use(cors.Default())
+
+	server = setupRoutes(server)
 
 	server.Run()
 }
