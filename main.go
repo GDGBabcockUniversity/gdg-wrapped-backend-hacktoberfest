@@ -34,8 +34,14 @@ func init() {
 	generalWrapped = jsonValue
 }
 
-func GetMemberWrappedInfo(num string) *WrappedInfo {
+func GetMemberWrappedInfo(num string) (*WrappedInfo, bool) {
 	memberData := member[num]
+	fmt.Println(memberData)
+
+	if memberData == nil {
+		return nil, false
+	}
+
 	var memberInfo WrappedInfo
 
 	value, err := json.Marshal(memberData)
@@ -48,7 +54,7 @@ func GetMemberWrappedInfo(num string) *WrappedInfo {
 		log.Fatalln(err)
 	}
 
-	return &memberInfo
+	return &memberInfo, true
 }
 
 func GetGeneralWrappedInfo() []byte {
@@ -76,9 +82,16 @@ func setupRoutes() *gin.Engine {
 	r.GET("/2023/member/:num", func(c *gin.Context) {
 		num := c.Param("num")
 
-		fmt.Println("num", num)
+		member, exists := GetMemberWrappedInfo(num)
+		fmt.Println(exists)
+		if !exists {
+			c.JSON(http.StatusNotFound, gin.H{
+				"success": false,
+				"error":   "number does not exist",
+			})
 
-		member := GetMemberWrappedInfo(num)
+			return
+		}
 		c.JSON(http.StatusOK, member)
 	})
 
