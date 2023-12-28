@@ -90,7 +90,6 @@ func setupRoutes() *gin.Engine {
 		num := c.Param("num")
 
 		member, exists := GetMemberWrappedInfo(num)
-		fmt.Println(exists)
 		if !exists {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
