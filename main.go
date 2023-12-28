@@ -2,12 +2,17 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
 )
 
-var dataMap = map[string]interface{}{}
+var (
+	dataMap        = map[string]interface{}{}
+	generalWrapped []byte
+	member         map[string]interface{}
+)
 
 func init() {
 	data, err := os.ReadFile("./data/new_results.json")
@@ -16,6 +21,30 @@ func init() {
 	}
 
 	json.Unmarshal(data, &dataMap)
+
+	general := dataMap["general_wrapped"].(map[string]interface{})
+	member = dataMap["members_wrappped"].(map[string]interface{})
+
+	jsonValue, err := json.Marshal(general)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	generalWrapped = jsonValue
+}
+
+func GetMemberWrappedInfo(num string) []byte {
+	memberData := member[num]
+
+	value, err := json.Marshal(memberData)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return value
+}
+
+func GetGeneralWrappedInfo() []byte {
+	return generalWrapped
 }
 
 func setupRoutes() *gin.Engine {
@@ -31,8 +60,6 @@ func setupRoutes() *gin.Engine {
 }
 
 func main() {
-	// mems := dataMap["members_wrappped"].(map[string]interface{}) //["members_wrapped"]
-
 	server := setupRoutes()
 
 	server.Run(":4000")
