@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -36,7 +35,6 @@ func init() {
 
 func GetMemberWrappedInfo(num string) (*WrappedInfo, bool) {
 	memberData := member[num]
-	fmt.Println(memberData)
 
 	if memberData == nil {
 		return nil, false
