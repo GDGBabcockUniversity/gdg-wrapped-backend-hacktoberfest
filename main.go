@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -32,15 +34,21 @@ func init() {
 	generalWrapped = jsonValue
 }
 
-func GetMemberWrappedInfo(num string) []byte {
+func GetMemberWrappedInfo(num string) *WrappedInfo {
 	memberData := member[num]
+	var memberInfo WrappedInfo
 
 	value, err := json.Marshal(memberData)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	return value
+	err = json.Unmarshal(value, &memberInfo)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return &memberInfo
 }
 
 func GetGeneralWrappedInfo() []byte {
@@ -51,9 +59,27 @@ func setupRoutes() *gin.Engine {
 	r := gin.Default()
 
 	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
+	})
+
+	r.GET("/2023/general", func(c *gin.Context) {
+		generalInfo := GetGeneralWrappedInfo()
+
+		c.JSON(http.StatusOK, gin.H{
+			"success": true,
+			"data":    string(generalInfo),
+		})
+	})
+
+	r.GET("/2023/member/:num", func(c *gin.Context) {
+		num := c.Param("num")
+
+		fmt.Println("num", num)
+
+		member := GetMemberWrappedInfo(num)
+		c.JSON(http.StatusOK, member)
 	})
 
 	return r
@@ -62,5 +88,5 @@ func setupRoutes() *gin.Engine {
 func main() {
 	server := setupRoutes()
 
-	server.Run(":4000")
+	server.Run()
 }
