@@ -57,8 +57,15 @@ func GetMemberWrappedInfo(num string) (*WrappedInfo, bool) {
 	return &memberInfo, true
 }
 
-func GetGeneralWrappedInfo() []byte {
-	return generalWrapped
+func GetGeneralWrappedInfo() *GeneralInfo {
+	var generalInfo GeneralInfo
+
+	err := json.Unmarshal(generalWrapped, &generalInfo)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return &generalInfo
 }
 
 func setupRoutes() *gin.Engine {
@@ -75,7 +82,7 @@ func setupRoutes() *gin.Engine {
 
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
-			"data":    string(generalInfo),
+			"data":    generalInfo,
 		})
 	})
 
@@ -92,7 +99,10 @@ func setupRoutes() *gin.Engine {
 
 			return
 		}
-		c.JSON(http.StatusOK, member)
+		c.JSON(http.StatusOK, gin.H{
+			"success": true,
+			"data":    member,
+		})
 	})
 
 	return r
