@@ -91,6 +91,7 @@ func setupRoutes(r *gin.Engine) *gin.Engine {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error":   "number does not exist",
+				"data":    nil,
 			})
 
 			return
@@ -98,6 +99,7 @@ func setupRoutes(r *gin.Engine) *gin.Engine {
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
 			"data":    member,
+			"error":   nil,
 		})
 	})
 
