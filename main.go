@@ -8,11 +8,14 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+
+	"github.com/philip-edekobi/wrapped/types"
+	"github.com/philip-edekobi/wrapped/util"
 )
 
 var (
 	dataMap        = map[string]interface{}{}
-	generalWrapped []byte
+	generalWrapped *types.ReadableGeneralInfo
 	member         map[string]interface{}
 )
 
@@ -31,17 +34,18 @@ func init() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	generalWrapped = jsonValue
+	wrapped := jsonValue
+	generalWrapped = GetGeneralWrappedInfo(wrapped)
 }
 
-func GetMemberWrappedInfo(num string) (*WrappedInfo, bool) {
+func GetMemberWrappedInfo(num string) (*types.WrappedInfo, bool) {
 	memberData := member[num]
 
 	if memberData == nil {
 		return nil, false
 	}
 
-	var memberInfo WrappedInfo
+	var memberInfo types.WrappedInfo
 
 	value, err := json.Marshal(memberData)
 	if err != nil {
@@ -56,15 +60,27 @@ func GetMemberWrappedInfo(num string) (*WrappedInfo, bool) {
 	return &memberInfo, true
 }
 
-func GetGeneralWrappedInfo() *GeneralInfo {
-	var generalInfo GeneralInfo
+func GetGeneralWrappedInfo(generalWrapped []byte) *types.ReadableGeneralInfo {
+	var generalInfo types.GeneralInfo
 
 	err := json.Unmarshal(generalWrapped, &generalInfo)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	return &generalInfo
+	correctGeneralInfo := TransFormGeneralInfo(&generalInfo)
+
+	return correctGeneralInfo
+}
+
+func TransFormGeneralInfo(info *types.GeneralInfo) *types.ReadableGeneralInfo {
+	newinfo := &types.ReadableGeneralInfo{
+		MostActiveGroup:           info.MostActiveGroup,
+		MostActiveTime:            info.MostActiveTime,
+		MostActiveMembers:         util.AdaptMembers(info.MostActiveMembers),
+		MostActiveMembersPerTrack: util.AdaptMemsPerTrack(info.MostActiveMembersPerTrack),
+	}
+	return newinfo
 }
 
 func setupRoutes(r *gin.Engine) *gin.Engine {
@@ -75,11 +91,10 @@ func setupRoutes(r *gin.Engine) *gin.Engine {
 	})
 
 	r.GET("/2023/general", func(c *gin.Context) {
-		generalInfo := GetGeneralWrappedInfo()
-
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
-			"data":    generalInfo,
+			"data":    generalWrapped,
+			"error":   nil,
 		})
 	})
 

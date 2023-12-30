@@ -1,10 +1,17 @@
-package main
+package types
 
 type GeneralInfo struct {
 	MostActiveGroup           Group          `json:"most_active_group"`
 	MostActiveTime            Time           `json:"most_active_time"`
 	MostActiveMembers         MemStruct      `json:"most_active_members"`
 	MostActiveMembersPerTrack []ActiveMember `json:"most_active_members_per_track"`
+}
+
+type ReadableGeneralInfo struct {
+	MostActiveGroup           Group                  `json:"most_active_group"`
+	MostActiveTime            Time                   `json:"most_active_time"`
+	MostActiveMembers         []ReadableMem          `json:"most_active_members"`
+	MostActiveMembersPerTrack []ReadableActiveMember `json:"most_active_members_per_track"`
 }
 
 type Group struct {
@@ -30,10 +37,21 @@ type MemStruct struct {
 	J int `json:"+234 703 809 8061"`
 }
 
+type ReadableMem struct {
+	Name     string `json:"name"`
+	Messages int    `json:"number_of_messages_sent"`
+}
 type ActiveMember struct {
 	Phone        string `json:"phone_number"`
 	MessageCount int    `json:"message_count"`
 	GC           string `json:"group_chat"`
+}
+
+type ReadableActiveMember struct {
+	Phone        string `json:"phone_number"`
+	MessageCount int    `json:"message_count"`
+	GC           string `json:"group_chat"`
+	Name         string `json:"name"`
 }
 
 type WrappedInfo struct {
