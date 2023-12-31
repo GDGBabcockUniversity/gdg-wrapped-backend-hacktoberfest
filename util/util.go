@@ -68,3 +68,14 @@ func AdaptMemsPerTrack(mems []types.ActiveMember) []types.ReadableActiveMember {
 
 	return arr
 }
+
+func TransFormGeneralInfo(info *types.GeneralInfo) *types.ReadableGeneralInfo {
+	newinfo := &types.ReadableGeneralInfo{
+		MostActiveGroup:           info.MostActiveGroup,
+		MostActiveTime:            info.MostActiveTime,
+		MostActiveMembers:         AdaptMembers(info.MostActiveMembers),
+		MostActiveMembersPerTrack: AdaptMemsPerTrack(info.MostActiveMembersPerTrack),
+	}
+
+	return newinfo
+}

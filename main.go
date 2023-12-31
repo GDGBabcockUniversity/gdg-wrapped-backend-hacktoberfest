@@ -68,19 +68,9 @@ func GetGeneralWrappedInfo(generalWrapped []byte) *types.ReadableGeneralInfo {
 		log.Fatalln(err)
 	}
 
-	correctGeneralInfo := TransFormGeneralInfo(&generalInfo)
+	correctGeneralInfo := util.TransFormGeneralInfo(&generalInfo)
 
 	return correctGeneralInfo
-}
-
-func TransFormGeneralInfo(info *types.GeneralInfo) *types.ReadableGeneralInfo {
-	newinfo := &types.ReadableGeneralInfo{
-		MostActiveGroup:           info.MostActiveGroup,
-		MostActiveTime:            info.MostActiveTime,
-		MostActiveMembers:         util.AdaptMembers(info.MostActiveMembers),
-		MostActiveMembersPerTrack: util.AdaptMemsPerTrack(info.MostActiveMembersPerTrack),
-	}
-	return newinfo
 }
 
 func setupRoutes(r *gin.Engine) *gin.Engine {
