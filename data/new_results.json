@@ -78,7 +78,7 @@
             }
         ]
     },
-    "members_wrappped": {
+    "members_wrapped": {
         "+228 93 14 27 33": {
             "number_of_messages_sent": 21,
             "percentile_messages": 79.55,
