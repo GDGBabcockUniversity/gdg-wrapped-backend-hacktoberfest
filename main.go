@@ -28,7 +28,7 @@ func init() {
 	json.Unmarshal(data, &dataMap)
 
 	general := dataMap["general_wrapped"].(map[string]interface{})
-	member = dataMap["members_wrappped"].(map[string]interface{})
+	member = dataMap["members_wrapped"].(map[string]interface{})
 
 	jsonValue, err := json.Marshal(general)
 	if err != nil {
