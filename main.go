@@ -80,6 +80,34 @@ func setupRoutes(r *gin.Engine) *gin.Engine {
 		})
 	})
 
+	r.GET("/healthz", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ok",
+		})
+	})
+
+	r.GET("/readyz", func(c *gin.Context) {
+		// Check that generalWrapped is loaded
+		if generalWrapped == nil {
+			c.JSON(http.StatusServiceUnavailable, gin.H{
+				"status": "not ready",
+			})
+			return
+		}
+
+		// Optionally, check if member is not empty
+		if len(member) == 0 {
+			c.JSON(http.StatusServiceUnavailable, gin.H{
+				"status": "not ready",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ready",
+		})
+	})
+
 	r.GET("/2023/general", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
