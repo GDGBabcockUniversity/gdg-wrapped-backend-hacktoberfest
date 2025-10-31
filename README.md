@@ -26,6 +26,7 @@ The `gdg-wrapped-backend-hacktoberfest` is a Go-based backend application design
 - **Member-Specific Wrapped Data**: Offers personalized summaries for individual members, including total messages sent, link sharing activity, question asking habits, and overall message impact. 👤
 - **REST API**: Exposes endpoints for retrieving both general and member-specific data via HTTP requests. 🌐
 - **CORS Support**: Includes CORS configuration to allow cross-origin requests.
+- **CORS Support**: Includes CORS configuration using an allowlist. Configure allowed origins via a `.env` file to control which origins are permitted for cross-origin requests.
 
 ## Tech Stack 💻
 
@@ -53,15 +54,27 @@ The `gdg-wrapped-backend-hacktoberfest` is a Go-based backend application design
     go mod download
     ```
 
+4.  **Configure Environment**: Copy `.env.example` to `.env` and configure your settings.
+
+    ```bash
+    cp .env.example .env
+    # Edit .env to set your ALLOWED_ORIGINS for CORS
+    ```
+
 ## Usage 🚀
 
 1.  **Run the Application**: Execute the `main.go` file to start the backend server.
+
+    The application will automatically load settings from your `.env` file, including CORS configuration.
 
     ```bash
     go run main.go
     ```
 
-2.  **Access API Endpoints**: Once the server is running, you can access the following endpoints:
+    **CORS Configuration**: Edit your `.env` file to set `ALLOWED_ORIGINS`:
+    
+    - Allow specific origins: `ALLOWED_ORIGINS=http://localhost:3000,https://example.com`
+    - Allow any origin (use with caution): `ALLOWED_ORIGINS=*`2.  **Access API Endpoints**: Once the server is running, you can access the following endpoints:
     - `GET /ping`: Health check endpoint.
     - `GET /2023/general`: Retrieve general wrapped data.
     - `GET /2023/member/:num`: Retrieve member-specific wrapped data by providing a member number.
@@ -83,6 +96,7 @@ gdg-wrapped-backend-hacktoberfest/
 │   └── types.go               # Go data structures for wrapped data
 ├── util/
 │   └── util.go                # Utility functions for data transformation
+├── .env.example               # Environment configuration template
 ├── go.mod                     # Go module file
 ├── go.sum                     # Go dependencies checksum file
 └── main.go                    # Main application entry point
