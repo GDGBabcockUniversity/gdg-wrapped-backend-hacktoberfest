@@ -5,9 +5,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 
 	"github.com/philip-edekobi/wrapped/types"
 	"github.com/philip-edekobi/wrapped/util"
@@ -140,9 +142,48 @@ func setupRoutes(r *gin.Engine) *gin.Engine {
 }
 
 func main() {
+	// Load .env file if it exists
+	if err := godotenv.Load(); err != nil {
+		log.Printf("No .env file found or error loading .env file: %v", err)
+	}
+
 	server := gin.Default()
 
-	server.Use(cors.Default())
+	// Configure CORS from ALLOWED_ORIGINS environment variable (from .env file).
+	// ALLOWED_ORIGINS should be a comma-separated list of allowed origins.
+	// Example in .env file: ALLOWED_ORIGINS=http://localhost:3000,https://example.com
+	allowedEnv := os.Getenv("ALLOWED_ORIGINS")
+	var allowOrigins []string
+	corsConfig := cors.Config{
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: false,
+	}
+
+	if allowedEnv != "" {
+		parts := strings.Split(allowedEnv, ",")
+		for _, p := range parts {
+			p = strings.TrimSpace(p)
+			if p == "" {
+				continue
+			}
+			// If a wildcard is provided, enable AllowAllOrigins
+			if p == "*" {
+				corsConfig.AllowAllOrigins = true
+				allowOrigins = nil
+				break
+			}
+			allowOrigins = append(allowOrigins, p)
+		}
+	}
+
+	if !corsConfig.AllowAllOrigins {
+		corsConfig.AllowOrigins = allowOrigins
+	}
+
+	log.Printf("CORS allowlist: %v", corsConfig.AllowOrigins)
+	server.Use(cors.New(corsConfig))
 
 	server = setupRoutes(server)
 
